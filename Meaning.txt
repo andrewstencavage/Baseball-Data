@@ -1,0 +1,130 @@
+ +  following pickoff throw by the catcher
+    *  indicates the following pitch was blocked by the catcher
+    .  marker for play not involving the batter
+    1  pickoff throw to first
+    2  pickoff throw to second
+    3  pickoff throw to third
+    >  Indicates a runner going on the pitch
+
+    B  ball
+    C  called strike
+    F  foul
+    H  hit batter
+    I  intentional ball
+    K  strike (unknown type)
+    L  foul bunt
+    M  missed bunt attempt
+    N  no pitch (on balks and interference calls)
+    O  foul tip on bunt
+    P  pitchout
+    Q  swinging on pitchout
+    R  foul ball on pitchout
+    S  swinging strike
+    T  foul tip
+    U  unknown or missed pitch
+    V  called ball because pitcher went to his mouth
+    X  ball put into play by batter
+    Y  ball put into play on pitchout
+
+
+****************************************************************************
+
+AP    appeal play
+BP    pop up bunt
+BG    ground ball bunt
+BGDP  bunt grounded into double play
+BINT  batter interference
+BL    line drive bunt
+BOOT  batting out of turn
+BP    bunt pop up
+BPDP  bunt popped into double play
+BR    runner hit by batted ball
+C     called third strike
+COUB  courtesy batter
+COUF  courtesy fielder
+COUR  courtesy runner
+DP    unspecified double play
+E$    error on $
+F     fly
+FDP   fly ball double play
+FINT  fan interference
+FL    foul
+FO    force out
+G     ground ball
+GDP   ground ball double play
+GTP   ground ball triple play
+IF    infield fly rule
+INT   interference
+IPHR  inside the park home run
+L     line drive
+LDP   lined into double play
+LTP   lined into triple play
+MREV  manager challenge of call on the field
+NDP   no double play credited for this play
+OBS   obstruction (fielder obstructing a runner)
+P     pop fly
+PASS  a runner passed another runner and was called out
+R$    relay throw from the initial fielder to $ with no out made
+RINT  runner interference
+SF    sacrifice fly
+SH    sacrifice hit (bunt)
+TH    throw
+TH%   throw to base %
+TP    unspecified triple play
+UINT  umpire interference
+UREV  umpire review of call on the field
+
+************************************************************************************************
+
+
+Each time the replay system is used, a slash tag is added to the play string. This will be /UREV for an 
+umpire-initiated review and /MREV for a manager challenge. Immediately after that play there will be a 
+comment record with details of the replay/challenge. The fields in this string are:
+
+com,"replay,inning,Batter ID,Batter Team ID,Umpire ID,Ballpark ID,Reason,Reversed,Initiator,Team,Type 
+Code"
+
+   Inning: inning in which the replay occurred
+   Batter ID: batter for the replay instance (not necessarily the player involved in the replay)
+   Batter Team ID: the team at bat for the replay
+   Umpire ID: crew chief�s ID
+   Ballpark ID: the ballpark in which the game was played
+   Reason (home run replay only):
+      O - Over the fence
+      F - Fair/foul
+      I - Fan interference
+   Reversed: Y or N
+   Initiator: I (home run instant replay, 2008-13), U (umpire, 2014-present), M (manager, 2014-present)
+   Team: team which challenged (only for M initiator)
+   Type code:
+     Code,Desc
+     H,Home run
+     G,Grounds rule
+     N,Fan interference
+     S,Boundary call
+     C,Force play
+     A,Tag play
+     O,Fair/foul (outfield)
+     T,Trap play (outfield)
+     I,Hit by pitch
+     M,Timing play
+     B,Touching a base
+     R,Passing runners
+     K,Record keeping
+     L,Multiple issues
+     P,Home plate collision
+     X,Other
+
+
+********************************************************************************************
+Position ordes
+
+1 - pitcher
+2 - Catcher
+3 - First base
+4 - Second Base
+5 - Third Base
+6 - short stop 
+7 - Left Field
+8 - Center Field
+9 - Right Field

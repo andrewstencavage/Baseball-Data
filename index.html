@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Baseball Stats</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js" integrity="sha384-pjaaA8dDz/5BgdFUPX6M/9SUZv4d12SUPF0axWc+VRZkx5xU3daN+lYb49+Ax+Tl"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/js/umd/button.js"></script>
+    <script src="js/possOutcomes.js"></script>
+
+    
+    <style>
+        body{
+            margin:25px;
+            position: relative;
+        }
+        html, body {
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>MLB Count-Specific Win Percentage Calculator</h1>
+    <form id="form" onsubmit="getResults();return false;">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <legend class="col-form-label col-sm-2 pt-0">Inning</legend>
+                <div class="col-sm-10">
+                    <div class="btn-group btn-group-lg btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="topBottom" value="0" autocomplete="off" checked> Top
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="topBottom" value="1" autocomplete="off"> Bottom
+                        </label>
+                    </div>
+                </div>
+                <br/>
+                <select id="inning" name="inning" class="form-control" required>
+                    <option selected value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="9+">9+</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <legend class="col-form-label col-sm-2 pt-0">Outs</legend>
+                <div class="col-sm-10">
+                    <div class="btn-group btn-group-lg btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="outs" value="0" autocomplete="off" checked> 0
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="outs" value="1" autocomplete="off"> 1
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="outs" value="2" autocomplete="off"> 2
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <div >Home Team Lead/Deficit (+/-): <b><span id="scoreStatus">Tied</span></b></div>
+                <div class="btn-group btn-group-lg btn-group-toggle">
+                    <button type="button" class="btn btn-secondary" onclick="incScore()">H +</button>
+                    <button type="button" class="btn btn-secondary" onclick="decScore()">V +</button>
+                </div>
+                <!-- <div id="scoreStatus">Tied</div> -->
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-6">
+                <legend class="col-form-label col-sm-2 pt-0">Runners</legend>
+                <div class="col-sm-10">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="first" name="first" value="true">First<br>
+                        <input class="form-check-input" type="checkbox" id="second" name="second" value="true">Second<br>
+                        <input class="form-check-input" type="checkbox" id="third" name="third" value="true">Third<br>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <legend class="col-form-label col-sm-2 pt-0">Balls</legend>
+                <div class="col-sm-10">
+                    <div class="btn-group btn-group-lg btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="balls" value="0" autocomplete="off" checked> 0
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="balls" value="1" autocomplete="off"> 1
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="balls" value="2" autocomplete="off"> 2
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="balls" value="3" autocomplete="off"> 3
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <legend class="col-form-label col-sm-2 pt-0">Strikes</legend>
+                <div class="col-sm-10">
+                    <div class="btn-group btn-group-lg btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="strikes" value="0" autocomplete="off" checked> 0
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="strikes" value="1" autocomplete="off"> 1
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="strikes" value="2" autocomplete="off"> 2
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    </form>
+    <div>
+        <h2 id="percent">Home Team Winning Probability: </h2>
+        <h3 id="outcomes">Possible Outcomes: </h3>
+        <ul id="outcomeList"></ul>
+    </div>
+    <br>
+    <button type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Calculating"
+        onclick="update()">Get Results</button>
+    <div id="footer">
+        <hr>
+        <p>Data taken from 1980-2017 seasons. Some game data is missing due to missing pitch data</p>
+        <p>The information used here was obtained free of
+            charge from and is copyrighted by Retrosheet. Interested
+            parties may contact Retrosheet at 20 Sunset Rd.,
+            Newark, DE 19711.</p>
+    </div>
+</body>
+<script>
+    let gameScoreDiff = 0;
+
+    function incScore(){
+        gameScoreDiff ++;
+        updateScoreDiff()
+    }
+    function decScore(){
+        gameScoreDiff --;
+        updateScoreDiff()
+    }
+    function updateScoreDiff(){
+        const scoreStatus = document.getElementById('scoreStatus');
+        scoreStatus.innerHTML = gameScoreDiff != 0 ? gameScoreDiff : 'Tied';
+    }
+    fetch('results.json')
+        .then(response => response.json())
+        .then(json => JSON = json)
+
+    JSON = null;
+    $('#load').on('click', function () {
+        var btn = $(this);
+        btn.button('loading');
+    });
+
+
+    function update(){
+        const inputDict = getInputs();
+        const results = getResults(inputDict,{});
+        seePossOutcomes(inputDict);
+        const lost = results['0'];
+        const won = results['1'];
+        try {
+            
+            if(!won){
+                won = 0;
+            }
+            if(!lost){
+                lost = 0;
+            }
+            var percent = ((won / (lost + won) * 100).toFixed(2) + "%") + " (" + won + "/" + (lost + won) +")";
+            var output = document.getElementById("percent");
+            if (!percent.includes("NaN%")) {
+                output.innerHTML = "Home Team Winning Probability: " + percent;
+            } else {
+                output.innerHTML = "No Data";
+            }
+        } catch (e) {
+            var output = document.getElementById("percent");
+            output.innerHTML = "No Data";
+        }
+    }
+</script>
+
+</html>

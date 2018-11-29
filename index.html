@@ -7,6 +7,8 @@
     <title>Baseball Stats</title>
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
+    <!-- Load TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3/dist/tf.min.js"> </script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
@@ -15,8 +17,7 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/js/umd/button.js"></script>
     <script src="js/possOutcomes.js"></script>
-    <!-- Load TensorFlow.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3/dist/tf.min.js"> </script>
+    <script src="js/ml.js"></script>
 
 
     
@@ -143,15 +144,15 @@
     </form>
     <div>
         <h2 id="percent">Home Team Winning Probability: </h2>
-        <h3 id="outcomes">Possible Outcomes: </h3>
-        <ul id="outcomeList"></ul>
+        <!--<h3 id="outcomes">Possible Outcomes: </h3>
+        <ul id="outcomeList"></ul>-->
     </div>
     <br>
     <button type="button" class="btn btn-primary btn-lg " id="load" data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i> Calculating"
         onclick="update()">Get Results</button>
     <div id="footer">
         <hr>
-        <p>Data taken from 1980-2017 seasons. Some game data is missing due to missing pitch data</p>
+        <p>Data taken from 1980-2017 seasons. Some game data is missing due to missing pitch data.</p>
         <p>The information used here was obtained free of
             charge from and is copyrighted by Retrosheet. Interested
             parties may contact Retrosheet at 20 Sunset Rd.,
@@ -175,14 +176,14 @@
     }
     fetch('results.json')
         .then(response => response.json())
-        .then(json => JSON = json);
+        .then(json => jsonResults = json)
+        .then(() => setup(jsonResults));
 
-    
 
     function update(){
         const inputDict = getInputs();
         const results = getResults(inputDict,{});
-        seePossOutcomes(inputDict);
+        //seePossOutcomes(inputDict);
         const lost = results['0'];
         const won = results['1'];
         try {

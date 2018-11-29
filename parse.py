@@ -4,6 +4,7 @@ from pitch import pitch
 from status import status
 import json
 from collections import defaultdict
+import tf
 
 dynamicNest = lambda: defaultdict(lambda: defaultdict(dynamicNest))
 pitchDict = dynamicNest()
@@ -187,7 +188,7 @@ def parseAtBat(play):
     return retPitches
 
 def createGame(gameId,game):
-    global pitchCount
+    # global pitchCount
     if(len(game)==0):
         # print("empty game",gameId)
         return 
@@ -195,12 +196,13 @@ def createGame(gameId,game):
     finalScore = lastBat.scoreDiff
     winner = finalScore >= 0
     for pitch in game:
-        pitchCount += 1
+        # pitchCount += 1
         pitch.winningTeam = winner
-        try:
-            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
-        except: 
-            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
+        # try:
+        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
+        # except: 
+        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
+        pitches.add(pitch)
         
 
 def readFile(f):
@@ -242,4 +244,5 @@ if __name__ == "__main__":
             if file.endswith(".EVA") or file.endswith(".EVN"):
                 readFile(getFilePath(folder,file))
     writeResults()
+    tf.trainModel(pitches)
     print(pitchCount)

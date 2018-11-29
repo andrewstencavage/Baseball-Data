@@ -38,7 +38,7 @@ function getResults(inputDict,changes) {
     const inpFirst = givenOrDefault(changes,inputDict,'first');
     const inpSecond = givenOrDefault(changes,inputDict,'second');
     const inpThird = givenOrDefault(changes,inputDict,'third');
-    return JSON[inpInning][inpScoreDiff][inpOuts][inpBalls][inpStrikes][inpFirst][inpSecond][inpThird];
+    return jsonResults[inpInning][inpScoreDiff][inpOuts][inpBalls][inpStrikes][inpFirst][inpSecond][inpThird];
 }
 
 function appendToOutcomeList(item){

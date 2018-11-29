@@ -25,6 +25,8 @@ class pitch:
         data["winningTeam"] = self.winningTeam
         data["id"] = self.id
         return data
+    def __repr__(self):
+        return 'B {} S {} O {} I {} sD {} 1 {} 2 {} 3 {} wt {}'.format(self.ball,self.strike,self.out,self.inning,self.scoreDiff,self.first,self.second,self.third,self.winningTeam)
 
 
 

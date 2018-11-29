@@ -1,10 +1,10 @@
-pitches = []
 import os
 from pitch import pitch
 from status import status
 import json
 from collections import defaultdict
 import tf
+import pickle
 
 dynamicNest = lambda: defaultdict(lambda: defaultdict(dynamicNest))
 pitchDict = dynamicNest()
@@ -14,6 +14,7 @@ ballPlays = ['B','I','P','V']
 activePlay = ['H','X','Y']
 foulPlays = ['F','R']
 gameStatus = status()
+
 
 def parseFieldPlay(fieldPlay,isBottom):
     slashPos = fieldPlay.find('/')
@@ -189,6 +190,7 @@ def parseAtBat(play):
 
 def createGame(gameId,game):
     # global pitchCount
+    pitches = []
     if(len(game)==0):
         # print("empty game",gameId)
         return 
@@ -202,7 +204,9 @@ def createGame(gameId,game):
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
         # except: 
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
-        pitches.add(pitch)
+        pitches.append(pitch)
+    with open('pitch.pk1', 'wb') as pOut:
+        pickle.dump(pitches,pOut)
         
 
 def readFile(f):
@@ -236,13 +240,14 @@ def writeResults():
     jsonOut = json.dumps(pitchDict)
     with(open('results.json','w')) as wf:
         wf.write(jsonOut)
+
     
 
 if __name__ == "__main__":
     for folder in os.listdir("./events"):
         for file in os.listdir("./events/" + folder):
-            if file.endswith(".EVA") or file.endswith(".EVN"):
+            # if file.endswith(".EVA") or file.endswith(".EVN"):
+            if file.endswith(".EVA"):
                 readFile(getFilePath(folder,file))
     writeResults()
-    tf.trainModel(pitches)
-    print(pitchCount)
+    tf.trainModel()

@@ -205,7 +205,7 @@ def createGame(gameId,game):
         # except: 
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
         pitches.append(pitch)
-    with open('pitch.pk1', 'wb') as pOut:
+    with open('pitch.pk1', 'ab') as pOut:
         pickle.dump(pitches,pOut)
         
 

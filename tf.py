@@ -1,6 +1,18 @@
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 import pickle
-x_train = []
+train = []
+columns = ['TopBottom','Innings','Outs','Balls','Strikes','ScoreDiff','First','Second','Third','WinningTeam']
+
+    # Display training progress by printing a single dot for each completed epoch
+class PrintDot(keras.callbacks.Callback):
+  def on_epoch_end(self, epoch, logs):
+    if epoch % 100 == 0: print('')
+    print('.', end='')
 
 def loadall(filename):
     with open(filename, "rb") as f:
@@ -24,32 +36,71 @@ def trainModel():
         for p in item:
             pitches.append(p)
     for p in pitches:
-        print(p)
+        # print(p)
         topBottom,inning = parseInning(p.inning)
         #(self.ball,self.strike,self.out,self.inning,self.scoreDiff,self.first,self.second,self.third,self.winningTeam)
-        x_train.append([
+        train.append([
             topBottom,
             inning,
             int(p.out),
             int(p.ball),
             int(p.strike),
-            p.scoreDiff,
-            p.first,
-            p.second,
-            p.third,
+            int(p.scoreDiff),
+            int(p.first),
+            int(p.second),
+            int(p.third),
+            int(p.winningTeam)
         ])
-# mnist = tf.keras.datasets.mnist
+        # mnist = tf.keras.datasets.mnist
+    dataset = pd.DataFrame(train,columns=columns)
 
-# (x_train, y_train), (x_test, y_test) = mnist.load_data()
-# x_train, x_test = x_train / 255.0, x_test / 255.0
+    train_dataset = dataset.sample(frac=0.8,random_state=0)
+    test_dataset = dataset.drop(train_dataset.index)
 
-# model = tf.keras.models.Sequential([
-#   tf.keras.layers.Flatten(),
-#   tf.keras.layers.Dense(512, activation=tf.nn.relu),
-#   tf.keras.layers.Dropout(0.2),
-#   tf.keras.layers.Dense(10, activation=tf.nn.softmax)
-# ])
+    train_stats = train_dataset.describe()
+    train_stats.pop("WinningTeam")
+    train_stats = train_stats.transpose()
+    print(train_stats)
 
+    train_labels = train_dataset.pop('WinningTeam')
+    test_labels = test_dataset.pop('WinningTeam')   
+
+    def norm(x):
+        return (x - train_stats['mean']) / train_stats['std']
+
+    normed_train_data = norm(train_dataset)
+    normed_test_data = norm(test_dataset)
+
+    model = keras.Sequential([
+        layers.Dense(64, activation=tf.nn.relu, input_shape=[len(train_dataset.keys())]),
+        layers.Dense(64, activation=tf.nn.relu),
+        layers.Dense(1)
+    ])
+
+    optimizer = tf.train.RMSPropOptimizer(0.001)
+
+    model.compile(loss='mse',
+                    optimizer=optimizer,
+                    metrics=['mae', 'mse'])
+
+    # example_batch = normed_train_data[:10]
+    # example_result = model.predict(example_batch)
+    # print(example_result)
+    
+
+
+    EPOCHS = 10
+
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
+
+    history = model.fit(normed_train_data, train_labels, epochs=EPOCHS,
+                        validation_split = 0.2, verbose=0, callbacks=[early_stop, PrintDot()])
+
+    loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=0)
+
+    print(history)
+    print('Loss: {} MAE: {} MSE: {}'.format(loss,mae,mse))
+    
 # model.compile(optimizer='adam',
 #               loss='sparse_categorical_crossentropy',
 #               metrics=['accuracy'])

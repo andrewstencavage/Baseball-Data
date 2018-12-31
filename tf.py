@@ -4,9 +4,12 @@ from tensorflow.keras import layers
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import pickle
+import pickle,os
 train = []
 columns = ['TopBottom','Innings','Outs','Balls','Strikes','ScoreDiff','First','Second','Third','WinningTeam']
+
+checkpoint_path = "checkpoints/cp.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
 
     # Display training progress by printing a single dot for each completed epoch
 class PrintDot(keras.callbacks.Callback):
@@ -62,17 +65,18 @@ def trainModel():
     train_stats = train_stats.transpose()
     print(train_stats)
 
-    train_labels = train_dataset.pop('WinningTeam')
-    test_labels = test_dataset.pop('WinningTeam')   
 
     def norm(x):
         return (x - train_stats['mean']) / train_stats['std']
 
-    normed_train_data = norm(train_dataset)
-    normed_test_data = norm(test_dataset)
+    normed_train_data = norm(train_dataset)[:10000]
+    normed_test_data = norm(test_dataset)[:10000]
+    
+    train_labels = normed_train_data.pop('WinningTeam')
+    test_labels = normed_test_data.pop('WinningTeam')   
 
     model = keras.Sequential([
-        layers.Dense(64, activation=tf.nn.relu, input_shape=[len(train_dataset.keys())]),
+        layers.Dense(64, activation=tf.nn.relu, input_shape=[len(normed_train_data.keys())]),
         layers.Dense(64, activation=tf.nn.relu),
         layers.Dense(1)
     ])
@@ -83,31 +87,21 @@ def trainModel():
                     optimizer=optimizer,
                     metrics=['mae', 'mse'])
 
-    # example_batch = normed_train_data[:10]
-    # example_result = model.predict(example_batch)
-    # print(example_result)
-    
+      
+    # early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
+    # Create checkpoint callback
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
+                                                 save_weights_only=True,
+                                                 verbose=1)
 
-
-    EPOCHS = 10
-
-    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
-
-    history = model.fit(normed_train_data, train_labels, epochs=EPOCHS,
-                        validation_split = 0.2, verbose=0, callbacks=[early_stop, PrintDot()])
+    model.fit(normed_train_data, train_labels, epochs=5,
+                    validation_data = (normed_test_data,test_labels),
+                    callbacks=[cp_callback])
 
     loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=0)
 
-    print(history)
     print('Loss: {} MAE: {} MSE: {}'.format(loss,mae,mse))
     
-# model.compile(optimizer='adam',
-#               loss='sparse_categorical_crossentropy',
-#               metrics=['accuracy'])
-
-# model.fit(x_train, y_train, epochs=5)
-
-# model.evaluate(x_test, y_test)
 
 if __name__ == '__main__':
     trainModel()

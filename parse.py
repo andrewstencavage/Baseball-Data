@@ -200,10 +200,10 @@ def createGame(gameId,game):
     for pitch in game:
         # pitchCount += 1
         pitch.winningTeam = winner
-        # try:
-        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
-        # except: 
-        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
+        try:
+            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
+        except: 
+            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
         pitches.append(pitch)
     with open('pitch.pk1', 'ab') as pOut:
         pickle.dump(pitches,pOut)
@@ -238,6 +238,7 @@ def getFilePath(folder,file):
 
 def writeResults():
     jsonOut = json.dumps(pitchDict)
+    print(jsonOut)
     with(open('results.json','w')) as wf:
         wf.write(jsonOut)
 
@@ -250,4 +251,4 @@ if __name__ == "__main__":
             if file.endswith(".EVA"):
                 readFile(getFilePath(folder,file))
     writeResults()
-    tf.trainModel()
+    #tf.trainModel()

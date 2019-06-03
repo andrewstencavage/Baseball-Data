@@ -32,14 +32,13 @@ def parseInning(inInning):
         inning = '10'
     return (int(topBottom),int(inning))
 
-def trainModel():
+def runTraining(loadModel):
     pickleItems = loadall('pitch.pk1')
     pitches = []
     for item in pickleItems:
         for p in item:
             pitches.append(p)
     for p in pitches:
-        # print(p)
         topBottom,inning = parseInning(p.inning)
         #(self.ball,self.strike,self.out,self.inning,self.scoreDiff,self.first,self.second,self.third,self.winningTeam)
         train.append([
@@ -54,7 +53,6 @@ def trainModel():
             int(p.third),
             int(p.winningTeam)
         ])
-        # mnist = tf.keras.datasets.mnist
     dataset = pd.DataFrame(train,columns=columns)
 
     train_dataset = dataset.sample(frac=0.8,random_state=0)
@@ -65,43 +63,68 @@ def trainModel():
     train_stats = train_stats.transpose()
     print(train_stats)
 
-
     def norm(x):
         return (x - train_stats['mean']) / train_stats['std']
 
-    normed_train_data = norm(train_dataset)[:10000]
-    normed_test_data = norm(test_dataset)[:10000]
+    train_labels = train_dataset.pop('WinningTeam')
+    test_labels = test_dataset.pop('WinningTeam')   
+
+    normed_train_data = norm(train_dataset)
+    normed_test_data = norm(test_dataset)
+    print(normed_test_data.describe())
+    return
     
-    train_labels = normed_train_data.pop('WinningTeam')
-    test_labels = normed_test_data.pop('WinningTeam')   
 
-    model = keras.Sequential([
-        layers.Dense(64, activation=tf.nn.relu, input_shape=[len(normed_train_data.keys())]),
-        layers.Dense(64, activation=tf.nn.relu),
-        layers.Dense(1)
-    ])
+    
 
-    optimizer = tf.train.RMSPropOptimizer(0.001)
+    x_val = normed_train_data[:10000]
+    partial_x_train = normed_train_data[10000:]
 
-    model.compile(loss='mse',
-                    optimizer=optimizer,
-                    metrics=['mae', 'mse'])
-
+    y_val = train_labels[:10000]
+    partial_y_train = train_labels[10000:]
       
-    # early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)
-    # Create checkpoint callback
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
-                                                 save_weights_only=True,
-                                                 verbose=1)
+    # The patience parameter is the amount of epochs to check for improvement
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
-    model.fit(normed_train_data, train_labels, epochs=5,
-                    validation_data = (normed_test_data,test_labels),
-                    callbacks=[cp_callback])
+    model = ''
+    if (os.path.exists('./checkpoints/my_model.h5') and loadModel):
+        print("LOAD MODEL")
+        model = keras.models.load_model('./checkpoints/my_model.h5')
+    else:
+        print("NEW MODEL")
+        model = keras.Sequential([
+            layers.Dense(64, activation=tf.nn.relu, input_shape=[len(normed_train_data.keys())]),
+            layers.Dense(64, activation=tf.nn.relu),
+            layers.Dense(2)
+        ])
+        model.compile(optimizer='adam',
+                        loss='binary_crossentropy',
+                        metrics=['acc'])
+        history = model.fit(partial_x_train,
+                            partial_y_trsain,
+                            # epochs=40,
+                            epochs=5,
+                            batch_size=512,
+                            validation_data=(x_val,y_val),
+                            verbose=0,
+                            callbacks=[early_stop,PrintDot()])
 
-    loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=0)
+        model.save('./checkpoints/my_model.h5')
 
-    print('Loss: {} MAE: {} MSE: {}'.format(loss,mae,mse))
+    results = model.evaluate(normed_test_data,test_labels)
+    print(results)
+
+    predictions = model.predict(normed_test_data).flatten()
+
+    plt.scatter(test_labels,predictions)
+    plt.xlabel('True Values')
+    plt.ylabel('Predictions')
+    plt.axis('equal')
+    plt.axis('square')
+    plt.xlim([0,plt.xlim()[1]])
+    plt.ylim([0,plt.ylim()[1]])
+    _ = plt.plot([-100, 100], [-100, 100])
+    plt.show()
     
-
 if __name__ == '__main__':
-    trainModel()
+    runTraining(True)

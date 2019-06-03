@@ -3,7 +3,7 @@ from pitch import pitch
 from status import status
 import json
 from collections import defaultdict
-import tf
+# import tf
 import pickle
 
 dynamicNest = lambda: defaultdict(lambda: defaultdict(dynamicNest))
@@ -200,10 +200,10 @@ def createGame(gameId,game):
     for pitch in game:
         # pitchCount += 1
         pitch.winningTeam = winner
-        try:
-            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
-        except: 
-            pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
+        # try:
+        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
+        # except: 
+        #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
         pitches.append(pitch)
     with open('pitch.pk1', 'ab') as pOut:
         pickle.dump(pitches,pOut)
@@ -238,17 +238,19 @@ def getFilePath(folder,file):
 
 def writeResults():
     jsonOut = json.dumps(pitchDict)
-    print(jsonOut)
     with(open('results.json','w')) as wf:
         wf.write(jsonOut)
 
     
 
 if __name__ == "__main__":
-    for folder in os.listdir("./events"):
-        for file in os.listdir("./events/" + folder):
-            # if file.endswith(".EVA") or file.endswith(".EVN"):
-            if file.endswith(".EVA"):
-                readFile(getFilePath(folder,file))
-    writeResults()
+    # for folder in os.listdir("./events"):
+    #     for file in os.listdir("./events/" + folder):
+    #         # if file.endswith(".EVA") or file.endswith(".EVN"):
+    #         if file.endswith(".EVA"):
+    #             readFile(getFilePath(folder,file))
+    for file in os.listdir("./events/2010seve"):
+        if file.endswith(".EVA"):
+            readFile(getFilePath("2010seve",file))
+    # writeResults()
     #tf.trainModel()

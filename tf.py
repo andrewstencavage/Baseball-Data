@@ -5,6 +5,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pickle,os
+import mysql.connector
+
 train = []
 columns = ['TopBottom','Innings','Outs','Balls','Strikes','ScoreDiff','First','Second','Third','WinningTeam']
 
@@ -24,6 +26,40 @@ def loadall(filename):
                 yield pickle.load(f)
             except EOFError:
                 break
+
+def getPitches():
+    pickleItems = loadall('pitch.pk1')
+    pitches = []
+    for item in pickleItems:
+        for p in item:
+            pitches.append(p)
+    for p in pitches:
+        topBottom,inning = parseInning(p.inning)
+        #(self.ball,self.strike,self.out,self.inning,self.scoreDiff,self.first,self.second,self.third,self.winningTeam)
+        train.append([
+            topBottom,
+            inning,
+            int(p.out),
+            int(p.ball),
+            int(p.strike),
+            int(p.scoreDiff),
+            int(p.first),
+            int(p.second),
+            int(p.third),
+            int(p.winningTeam)
+        ])
+
+def getCursor():
+    mydb = mysql.connector.connect(
+        host='10.0.1.5',
+        user='nGrok',
+        passwd='PythonSucks123!',
+        database='baseball'
+    )
+    cursor = mydb.cursor()
+    sql = "INSERT INTO pitch (1,5,0,3,2,-3,1,1,0,0)"
+    cursor.execute(sql)
+    mydb.commit()
 
 def parseInning(inInning):
     topBottom = inInning[0:1]
@@ -69,10 +105,10 @@ def runTraining(loadModel):
     train_labels = train_dataset.pop('WinningTeam')
     test_labels = test_dataset.pop('WinningTeam')   
 
-    normed_train_data = norm(train_dataset)
-    normed_test_data = norm(test_dataset)
-    print(normed_test_data.describe())
-    return
+    # normed_train_data = norm(train_dataset)
+    # normed_test_data = norm(test_dataset)
+    normed_train_data = train_dataset
+    normed_test_data = test_dataset
     
 
     
@@ -101,7 +137,7 @@ def runTraining(loadModel):
                         loss='binary_crossentropy',
                         metrics=['acc'])
         history = model.fit(partial_x_train,
-                            partial_y_trsain,
+                            partial_y_train,
                             # epochs=40,
                             epochs=5,
                             batch_size=512,
@@ -127,4 +163,5 @@ def runTraining(loadModel):
     plt.show()
     
 if __name__ == '__main__':
-    runTraining(True)
+    getCursor()
+    # getPitches()

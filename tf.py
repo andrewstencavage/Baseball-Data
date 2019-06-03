@@ -48,6 +48,7 @@ def getPitches():
             int(p.third),
             int(p.winningTeam)
         ])
+    return train
 
 def getCursor():
     mydb = mysql.connector.connect(
@@ -56,9 +57,18 @@ def getCursor():
         passwd='PythonSucks123!',
         database='baseball'
     )
+    pitches = getPitches()
+    # mydb = mysql.connector.connect(
+    #     host='localhost',
+    #     user='svcNode',
+    #     passwd='PythonSucks123!',
+    #     database='baseball'
+    # )
     cursor = mydb.cursor()
-    sql = "INSERT INTO pitch (1,5,0,3,2,-3,1,1,0,0)"
-    cursor.execute(sql)
+    sql = "INSERT INTO pitch (topBottom,inning,numOut,ball,strike,scoreDiff,firstBase,secondBase,thirdBase,winningTeam) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    for p in pitches:
+        val = p
+        cursor.execute(sql,val)
     mydb.commit()
 
 def parseInning(inInning):

@@ -52,7 +52,7 @@ def getPitches():
 
 def getCursor():
     mydb = mysql.connector.connect(
-        host='10.0.1.5',
+        host='localhost',
         user='nGrok',
         passwd='PythonSucks123!',
         database='baseball'

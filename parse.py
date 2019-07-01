@@ -244,13 +244,13 @@ def writeResults():
     
 
 if __name__ == "__main__":
-    for folder in os.listdir("./events"):
-        for file in os.listdir("./events/" + folder):
-            if file.endswith(".EVA") or file.endswith(".EVN"):
-            # if file.endswith(".EVA"):
-                readFile(getFilePath(folder,file))
-    # for file in os.listdir("./events/2010seve"):
-    #     if file.endswith(".EVA"):
-    #         readFile(getFilePath("2010seve",file))
+    # for folder in os.listdir("./events"):
+    #     for file in os.listdir("./events/" + folder):
+    #         if file.endswith(".EVA") or file.endswith(".EVN"):
+    #         # if file.endswith(".EVA"):
+    #             readFile(getFilePath(folder,file))
+    for file in os.listdir("./events/2010seve"):
+        if file.endswith(".EVA"):
+            readFile(getFilePath("2010seve",file))
     # writeResults()
     #tf.trainModel()

@@ -198,6 +198,11 @@ def createGame(gameId,game):
     lastBat = game[-1]
     finalScore = lastBat.scoreDiff
     winner = finalScore >= 0
+    endResult = [0,0]
+    if winner:
+        endResult = [1,0]
+    else:
+        endResult = [0,1]
     for pitch in game:
         # try:
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
@@ -208,7 +213,7 @@ def createGame(gameId,game):
         pitchWrite =csv.writer(pitchFile)
         for p in pitches:
             topBottom,inning = parseInning(p.inning)
-            pitchWrite.writerow([inning,topBottom,p.scoreDiff,p.out,p.ball,p.strike,int(p.first),int(p.second),int(p.third),int(winner)])
+            pitchWrite.writerow([inning,topBottom,p.scoreDiff,p.out,p.ball,p.strike,int(p.first),int(p.second),int(p.third),endResult[0],endResult[1]])
         
 
 def readFile(f):
@@ -254,7 +259,7 @@ if __name__ == "__main__":
     
     with open('pitches.csv','w') as pitchFile:
         pitchWrite =csv.writer(pitchFile)
-        pitchWrite.writerow(['inning','topBottom','scoreDiff','out','ball','strike','first','second','third','winningTeam'])
+        pitchWrite.writerow(['inning','topBottom','scoreDiff','out','ball','strike','first','second','third','home','away'])
     # for folder in os.listdir("./events"):
     #     for file in os.listdir("./events/" + folder):
     #         # if file.endswith(".EVA") or file.endswith(".EVN"):

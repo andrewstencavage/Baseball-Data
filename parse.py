@@ -5,6 +5,7 @@ import json
 from collections import defaultdict
 # import tf
 import pickle
+import csv
 
 dynamicNest = lambda: defaultdict(lambda: defaultdict(dynamicNest))
 pitchDict = dynamicNest()
@@ -198,15 +199,16 @@ def createGame(gameId,game):
     finalScore = lastBat.scoreDiff
     winner = finalScore >= 0
     for pitch in game:
-        # pitchCount += 1
-        pitch.winningTeam = winner
         # try:
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] += 1
         # except: 
         #     pitchDict[pitch.inning][pitch.scoreDiff][pitch.out][pitch.ball][pitch.strike][int(pitch.first)][int(pitch.second)][int(pitch.third)][int(winner)] = 1
         pitches.append(pitch)
-    with open('pitch.pk1', 'ab') as pOut:
-        pickle.dump(pitches,pOut)
+    with open('pitches.csv','a') as pitchFile:
+        pitchWrite =csv.writer(pitchFile)
+        for p in pitches:
+            topBottom,inning = parseInning(p.inning)
+            pitchWrite.writerow([inning,topBottom,p.scoreDiff,p.out,p.ball,p.strike,int(p.first),int(p.second),int(p.third),int(winner)])
         
 
 def readFile(f):
@@ -241,9 +243,18 @@ def writeResults():
     with(open('results.json','w')) as wf:
         wf.write(jsonOut)
 
-    
+def parseInning(inInning):
+    topBottom = inInning[0:1]
+    inning = inInning[1:]
+    if inning == '9+':
+        inning = '10'
+    return (int(topBottom),int(inning))  
 
 if __name__ == "__main__":
+    
+    with open('pitches.csv','w') as pitchFile:
+        pitchWrite =csv.writer(pitchFile)
+        pitchWrite.writerow(['inning','topBottom','scoreDiff','out','ball','strike','first','second','third','winningTeam'])
     # for folder in os.listdir("./events"):
     #     for file in os.listdir("./events/" + folder):
     #         # if file.endswith(".EVA") or file.endswith(".EVN"):
@@ -252,5 +263,6 @@ if __name__ == "__main__":
     for file in os.listdir("./events/2010seve"):
         if file.endswith(".EVA"):
             readFile(getFilePath("2010seve",file))
+            exit
     # writeResults()
-    #tf.trainModel()
+    # tf.trainModel()

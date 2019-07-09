@@ -211,7 +211,9 @@ def createGame(gameId,game):
         pitchWrite =csv.writer(pitchFile)
         for p in pitches:
             topBottom,inning = parseInning(p.inning)
+
             pitchWrite.writerow([gameId,inning,topBottom,p.scoreDiff,p.out,p.ball,p.strike,int(p.first),int(p.second),int(p.third),endResult])
+
         
 
 def readFile(f):
@@ -265,5 +267,4 @@ if __name__ == "__main__":
     # for file in os.listdir("./events/2010seve"):
     #     if file.endswith(".EVA"):
     #         readFile(getFilePath("2010seve",file))
-    # writeResults()
-    #tf.trainModel()
+    # tf.trainModel()

@@ -34,7 +34,7 @@ def parseFieldPlay(fieldPlay,isBottom):
         starts = []
         ends = []
         for p in runPlays:
-            if(p[1]=='X' and p.find('E')==-1):
+            if(p[1]=='X' and (p.find('E')==-1 or p.find('TH')!=-1)):
                 #players out
                 if(p[0]=='1'):
                     gameStatus.first=False
@@ -99,7 +99,30 @@ def parseFieldPlay(fieldPlay,isBottom):
             #runner was caught stealing
             #an out was already accounted for, so we need to subtract one
             gameStatus.out-=1
-            
+
+    sbPos = batterPlay.find('SB')
+    while(sbPos != -1):
+        ignoreBatter = True
+        runner = batterPlay[sbPos + 2]
+        if(runner == '2'):
+            gameStatus.second = True
+            gameStatus.first = False
+        elif(runner == '3'):
+            gameStatus.second = False
+            gameStatus.third = True
+        elif(runner == 'H'):
+            gameStatus.third = False
+            #Occassionally a log might show SBH and 3-H which unless ignored here will
+            #show an extra run
+            if(batterPlay.find('3-H')==-1):
+                if(isBottom == '1'):
+                    gameStatus.scoreDiff += 1
+                else:
+                    gameStatus.scoreDiff -= 1  
+        batterPlay = batterPlay[sbPos + 1:]
+        sbPos = batterPlay.find('SB')
+
+
     if(ignoreBatter == False):
         if(batterPlay[0]=='S' 
             or batterPlay[:2]=='HP'  
@@ -267,4 +290,3 @@ if __name__ == "__main__":
     # for file in os.listdir("./events/2010seve"):
     #     if file.endswith(".EVA"):
     #         readFile(getFilePath("2010seve",file))
-    # tf.trainModel()
